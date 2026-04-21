@@ -1,5 +1,6 @@
 #include "ext_mess.h"
 #include "ext_obex.h"
+#include "ext_post.h"
 #include "ext_proto.h"
 
 // Local includes
@@ -18,9 +19,11 @@ void simplexity_perform64(
     long          flags,
     void         *userparam
 ) {
-    double  sr     = s->samplerate;
-    int64_t seed   = (int64_t)s->seed;
-    double  offset = s->offset;
+    double  sr      = s->samplerate;
+    int64_t seed    = (int64_t)s->seed;
+    double  offset  = s->offset;
+    char    hashfn  = s->hashfn;
+    long    octaves = s->octaves;
 
     // DSP I/O
     double *frequency   = ins[0];
@@ -30,14 +33,17 @@ void simplexity_perform64(
     double *out = outs[0];
 
     for (int i = 0; i < sampleframes; i++) {
-
         double fr = s->frequency_connected ? frequency[i] : 1.0;
         double la = s->lacunarity_connected ? lacunarity[i] : 2.0;
         double pe = s->persistence_connected ? persistence[i] : 0.5;
 
         offset += fr / sr;
 
-        out[i] = simplex_fractal(s->octaves, la, pe, offset, seed);
+        if (hashfn) {
+            out[i] = simplex_fractal_moremur(octaves, la, pe, offset, seed);
+        } else {
+            out[i] = simplex_fractal_pearson(octaves, la, pe, offset, seed);
+        }
     }
 
     s->offset = offset;

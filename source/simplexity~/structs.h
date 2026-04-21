@@ -15,6 +15,7 @@ typedef struct _simplexity {
     short persistence_connected;
 
     // Simplex
+    char   hashfn;
     long   seed;
     double offset;
     long   octaves;

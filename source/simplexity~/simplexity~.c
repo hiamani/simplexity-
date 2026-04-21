@@ -26,12 +26,22 @@ void ext_main(void *r) {
     class_addmethod(c, (method)simplexity_assist, "assist", A_CANT, 0);
     class_addmethod(c, (method)simplexity_dsp64, "dsp64", A_CANT, 0);
 
+    CLASS_ATTR_CHAR(c, "hashfn", 0, t_simplexity, hashfn);
+    CLASS_ATTR_STYLE(c, "hashfn", 0, "onoff");
+    CLASS_ATTR_LABEL(c, "hashfn", 0, "Use Moremur Hash");
+    CLASS_ATTR_DEFAULT(c, "hashfn", 0, "0");
+    CLASS_ATTR_SAVE(c, "hashfn", 0);
+
     CLASS_ATTR_LONG(c, "octaves", 0, t_simplexity, octaves);
-    CLASS_ATTR_FILTER_CLIP(c, "octaves", 1, 16);
+    CLASS_ATTR_FILTER_CLIP(c, "octaves", 1, 8);
     CLASS_ATTR_LABEL(c, "octaves", 0, "Octaves");
+    CLASS_ATTR_DEFAULT(c, "octaves", 0, "1");
+    CLASS_ATTR_SAVE(c, "octaves", 0);
 
     CLASS_ATTR_LONG(c, "seed", 0, t_simplexity, seed);
     CLASS_ATTR_LABEL(c, "seed", 0, "Seed");
+    CLASS_ATTR_DEFAULT(c, "seed", 0, "0");
+    CLASS_ATTR_SAVE(c, "seed", 0);
 
     class_dspinit(c);
     class_register(CLASS_BOX, c);
@@ -51,6 +61,7 @@ void *simplexity_new(t_symbol *sym, long argc, t_atom *argv) {
         s->lacunarity_connected  = 0;
         s->persistence_connected = 0;
 
+        s->hashfn  = 0;
         s->seed    = 0;
         s->offset  = 0;
         s->octaves = 1;

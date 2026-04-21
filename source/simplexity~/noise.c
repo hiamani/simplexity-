@@ -10,6 +10,13 @@ static inline int64_t fastfloor(double fp) {
     return (fp < i) ? (i - 1) : (i);
 }
 
+static inline double gradient(uint8_t h, double x) {
+    double g = 1.0 + (h & 7);
+    if ((h & 8) != 0)
+        g = -g;
+    return g * x;
+}
+
 static const uint8_t perm[256] = {
     151, 160, 137, 91,  90,  15,  131, 13,  201, 95,  96,  53,  194, 233, 7,
     225, 140, 36,  103, 30,  69,  142, 8,   99,  37,  240, 21,  10,  23,  190,
@@ -32,7 +39,7 @@ static const uint8_t perm[256] = {
 };
 
 // https://en.wikipedia.org/wiki/Pearson_hashing
-static uint8_t hash(int64_t input, int64_t seed) {
+static inline uint8_t pearson_hash(int64_t input, int64_t seed) {
     uint8_t  output = 0;
     uint8_t *bytes  = (uint8_t *)&input;
     uint8_t *sbytes = (uint8_t *)&seed;
@@ -42,14 +49,7 @@ static uint8_t hash(int64_t input, int64_t seed) {
     return output;
 }
 
-static double gradient(uint8_t h, double x) {
-    double g = 1.0 + (h & 7);
-    if ((h & 8) != 0)
-        g = -g;
-    return g * x;
-}
-
-double simplex_noise(double x, int64_t seed) {
+double simplex_noise_pearson(double x, int64_t seed) {
     int64_t i0 = fastfloor(x);
     int64_t i1 = i0 + 1;
     double  x0 = x - i0;
@@ -57,16 +57,16 @@ double simplex_noise(double x, int64_t seed) {
 
     double t0 = 1.0 - x0 * x0;
     t0 *= t0;
-    double n0 = t0 * t0 * gradient(hash(i0, seed), x0);
+    double n0 = t0 * t0 * gradient(pearson_hash(i0, seed), x0);
 
     double t1 = 1.0 - x1 * x1;
     t1 *= t1;
-    double n1 = t1 * t1 * gradient(hash(i1, seed), x1);
+    double n1 = t1 * t1 * gradient(pearson_hash(i1, seed), x1);
 
     return 0.395 * (n0 + n1);
 }
 
-double simplex_fractal(
+double simplex_fractal_pearson(
     long octaves, double lacunarity, double persistence, double x, int64_t seed
 ) {
     double output = 0.0;
@@ -75,7 +75,53 @@ double simplex_fractal(
     double amp    = 1.0;
 
     for (int i = 0; i < octaves; i++) {
-        output += amp * simplex_noise(x * freq, seed);
+        output += amp * simplex_noise_pearson(x * freq, seed);
+        denom += amp;
+        freq *= lacunarity;
+        amp *= persistence;
+    }
+
+    return output / denom;
+}
+
+// https://mostlymangling.blogspot.com/2019/12/
+static inline uint8_t moremur_hash(int64_t input, int64_t seed) {
+    uint64_t h = (uint64_t)(input ^ seed);
+    h ^= h >> 27;
+    h *= 0x3C79AC492BA7B653ULL;
+    h ^= h >> 33;
+    h *= 0x1C69B3F74AC4AE35ULL;
+    h ^= h >> 27;
+    return (uint8_t)(h & 255);
+}
+
+double simplex_noise_moremur(double x, int64_t seed) {
+    int64_t i0 = fastfloor(x);
+    int64_t i1 = i0 + 1;
+    double  x0 = x - i0;
+    double  x1 = x0 - 1.0;
+
+    double t0 = 1.0 - x0 * x0;
+    t0 *= t0;
+    double n0 = t0 * t0 * gradient(moremur_hash(i0, seed), x0);
+
+    double t1 = 1.0 - x1 * x1;
+    t1 *= t1;
+    double n1 = t1 * t1 * gradient(moremur_hash(i1, seed), x1);
+
+    return 0.395 * (n0 + n1);
+}
+
+double simplex_fractal_moremur(
+    long octaves, double lacunarity, double persistence, double x, int64_t seed
+) {
+    double output = 0.0;
+    double denom  = 0.0;
+    double freq   = 1.0;
+    double amp    = 1.0;
+
+    for (int i = 0; i < octaves; i++) {
+        output += amp * simplex_noise_moremur(x * freq, seed);
         denom += amp;
         freq *= lacunarity;
         amp *= persistence;
