@@ -42,7 +42,8 @@ your platform!
 
 @seed    <number>: A number that changes the base of the hashing algorithm.
 @octaves <number>: The number of octaves; the default is 1. Adding more than
-                   one octave enables lacunarity and persistence inputs.
+                   one octave enables lacunarity and persistence inputs. Adding
+                   more octaves increases CPU load!
 @hashfn  <enum>:   Which hashing function to use. Default is 0 (pearson), which
                    is incredibly pseudo-random, but expensive. Pass 1 to use the
                    "Moremur" hash, which is more performant, but less "random".
