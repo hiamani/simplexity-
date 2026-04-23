@@ -1,6 +1,5 @@
 #include "ext_mess.h"
 #include "ext_obex.h"
-#include "ext_post.h"
 #include "ext_proto.h"
 
 // Local includes
