@@ -32,9 +32,10 @@ void simplexity_perform64(
     double *out = outs[0];
 
     for (int i = 0; i < sampleframes; i++) {
-        double fr = s->frequency_connected ? frequency[i] : 1.0;
-        double la = s->lacunarity_connected ? lacunarity[i] : 2.0;
-        double pe = s->persistence_connected ? persistence[i] : 0.5;
+        double fr = s->frequency_connected ? frequency[i] : s->frequency_f;
+        double la = s->lacunarity_connected ? lacunarity[i] : s->lacunarity_f;
+        double pe =
+            s->persistence_connected ? persistence[i] : s->persistence_f;
 
         offset += fr / sr;
 

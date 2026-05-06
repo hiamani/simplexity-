@@ -14,6 +14,11 @@ typedef struct _simplexity {
     short lacunarity_connected;
     short persistence_connected;
 
+    // Floats
+    double frequency_f;
+    double lacunarity_f;
+    double persistence_f;
+
     // Simplex
     char   hashfn;
     long   seed;

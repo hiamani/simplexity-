@@ -25,6 +25,7 @@ void ext_main(void *r) {
 
     class_addmethod(c, (method)simplexity_assist, "assist", A_CANT, 0);
     class_addmethod(c, (method)simplexity_dsp64, "dsp64", A_CANT, 0);
+    class_addmethod(c, (method)simplexity_float, "float", A_FLOAT, 0);
 
     CLASS_ATTR_CHAR(c, "hashfn", 0, t_simplexity, hashfn);
     CLASS_ATTR_STYLE(c, "hashfn", 0, "onoff");
@@ -60,6 +61,10 @@ void *simplexity_new(t_symbol *sym, long argc, t_atom *argv) {
         s->frequency_connected   = 0;
         s->lacunarity_connected  = 0;
         s->persistence_connected = 0;
+
+        s->frequency_f   = 1.0;
+        s->lacunarity_f  = 2.0;
+        s->persistence_f = 0.5;
 
         s->hashfn  = 0;
         s->seed    = 0;
