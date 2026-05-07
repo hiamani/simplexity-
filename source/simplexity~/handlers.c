@@ -19,13 +19,13 @@ void simplexity_assist(t_simplexity *s, void *b, long m, long a, char *str) {
     if (m == 1) {
         switch (a) {
         case 0:
-            sprintf(str, "(signal) frequency");
+            sprintf(str, "(signal/float) frequency");
             break;
         case 1:
-            sprintf(str, "(signal) lacunarity");
+            sprintf(str, "(signal/float) lacunarity");
             break;
         case 2:
-            sprintf(str, "(signal) persistence");
+            sprintf(str, "(signal/float) persistence");
             break;
         }
     } else {
